@@ -1,30 +1,45 @@
 {
   "expo": {
-    "name": "deadlihood_v3",
-    "slug": "deadlihood_v3",
-    "version": "1.0.0",
+    "name": "Deadlihood",
+    "description": "Weekly deaths statistics lookup tool; for all causes. All data is obtained via the ONS (Office for National Statistics) API, and calculations are run to obtain total number of deaths, as well as mortality rates for all administrative areas of England and Wales. Postcode lookup achieved via postcodes.io API. NB: The ONS has stopped updating the datasets as of 2024.",
+    "slug": "Deadlihood",
+    "version": "3.1.1",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/google_play_store.png",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
+      "image": "./assets/jump_splash.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "foregroundImage": "./assets/skull_icon_adaptive_smaller.png",
+        "backgroundImage": "./assets/background_icon_adaptive.png"
+      },
+      "package": "com.fractal_developments.deadlihood",
+      "versionCode": 11,
+      "permissions": []
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/google_play_store.png"
+    },
+    "androidNavigationBar": {
+      "backgroundColor": "#612886"
+    },
+    "androidStatusBar": {
+      "backgroundColor": "#612886"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "175b7966-e5d8-44ad-a97f-61fd7d627984"
+      }
     }
   }
 }
