@@ -655,9 +655,9 @@ export default class App extends Component {
             color="#10c62d"
             autoCompleteType="postal-code"
           />
-          {this.state.buttonPressed == true ? null : (
-            <PostLoader {...this.state} />
-          )}
+          {this.state.buttonPressed == true
+            ? null
+            : !this.state.loading && <PostLoader {...this.state} />}
 
           <PreLoader preLoaderVisible={this.state.loading} />
         </View>

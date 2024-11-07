@@ -212,7 +212,7 @@ export default class PostLoader extends Component {
               style={styles.button}
               onPress={() => this.setModalVisible(true)}
             >
-              <Text style={styles.whyText}>Why?</Text>
+              <Text style={styles.whyText}>More info</Text>
             </Pressable>
 
             <Text style={styles.quoteText}>
@@ -372,12 +372,12 @@ const styles = StyleSheet.create({
   },
   questionText: {
     fontSize: 14,
-    textAlign: "justify",
     fontWeight: "normal",
+    textAlign: "justified",
     color: "#10c62d",
     fontWeight: "bold",
     textShadowColor: "black",
-    textShadowRadius: 10,
+    textShadowRadius: 5,
     marginBottom: 10,
     marginTop: 10,
   },
