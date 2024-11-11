@@ -24,7 +24,7 @@
         "backgroundImage": "./assets/background_icon_adaptive.png"
       },
       "package": "com.fractal_developments.deadlihood",
-      "versionCode": 12,
+      "versionCode": 13,
       "permissions": []
     },
     "web": {
