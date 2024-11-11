@@ -7,6 +7,7 @@ import {
   Pressable,
   View,
   Image,
+  Linking,
 } from "react-native";
 import Unorderedlist from "react-native-unordered-list";
 import * as WebBrowser from "expo-web-browser";
@@ -219,7 +220,16 @@ export default class PostLoader extends Component {
               *The ONS has stopped updating the datasets as of 2024.
             </Text>
             <Text style={styles.sourceText}>
-              Source ➡ Office for National Statistics (www.ons.gov.uk)
+              Source ➡ Office for National Statistics (
+              <Text
+                style={{ color: "blue" }}
+                onPress={() => Linking.openURL("https://www.ons.gov.uk")}
+              >
+                www.ons.gov.uk
+              </Text>
+              ) NB: This app is not affiliated with the ONS. It is only using
+              freely available data (via the freely available API). Any and all
+              interpretations of this data are limited to the scope of this app.
             </Text>
             <Text style={styles.clearText}>
               Press the
@@ -357,7 +367,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textShadowColor: "grey",
     textShadowRadius: 10,
-    padding: 5,
+    padding: 20,
   },
   clearText: {
     fontSize: 14,

@@ -23,3 +23,5 @@ Other details:
 This is an entirely solo project.
 
 The ONS has discontinued the weekly datasets as of 2024.
+
+NB: This app is not affiliated with the ONS. It is only using freely available data (via the freely available API). Any and all interpretations of this data are limited to the scope of this app.
