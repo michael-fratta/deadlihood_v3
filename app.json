@@ -14,9 +14,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -43,8 +41,6 @@
         "projectId": "175b7966-e5d8-44ad-a97f-61fd7d627984"
       }
     },
-    "plugins": [
-      "expo-web-browser"
-    ]
+    "plugins": ["expo-web-browser"]
   }
 }

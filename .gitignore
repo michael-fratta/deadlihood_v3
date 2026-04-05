@@ -29,7 +29,27 @@ yarn-error.*
 *.pem
 
 # local env files
-.env*.local
+.env
+.env.*
+!.env.example
 
 # typescript
 *.tsbuildinfo
+
+# logs
+*.log
+
+# coverage
+coverage/
+
+# Expo shared local state
+.expo-shared/
+
+# local build outputs
+*.apk
+*.aab
+*.ipa
+
+# editor settings
+.idea/
+.vscode/
