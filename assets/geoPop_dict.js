@@ -1,4 +1,4 @@
-export default geoPop_dict = {
+const geoPop_dict = {
   // https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland
   // filter Geography by: London Borough, Metropolitan District, Non-Metropolitan District, Unitary Authority
   // sort alphabetically by Geography
@@ -335,3 +335,4 @@ export default geoPop_dict = {
   E07000239: 101139,
   E06000014: 211012,
 };
+export default geoPop_dict;

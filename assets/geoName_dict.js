@@ -1,4 +1,4 @@
-export default geoName_dict = {
+const geoName_dict = {
   Adur: "E07000223",
   Allerdale: "E07000026",
   "Amber Valley": "E07000032",
@@ -331,3 +331,4 @@ export default geoName_dict = {
   "Wyre Forest": "E07000239",
   York: "E06000014",
 };
+export default geoName_dict;
