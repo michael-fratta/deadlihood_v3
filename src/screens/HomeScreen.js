@@ -112,8 +112,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     backgroundColor: COLORS.background,
-    textShadowColor: COLORS.textDark,
-    textShadowRadius: 5,
+    color: COLORS.textPrimary,
   },
   placeholderStyle: {
     fontSize: 14,
