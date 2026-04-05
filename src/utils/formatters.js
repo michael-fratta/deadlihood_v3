@@ -9,3 +9,11 @@ export function normalizePostcode(value) {
     .replace(/\s+/g, "")
     .toUpperCase();
 }
+
+export function isPotentialUkPostcode(value) {
+  return /^[A-Z]{1,2}\d[A-Z\d]?\d?[A-Z]{0,2}$/.test(normalizePostcode(value));
+}
+
+export function isFullUkPostcode(value) {
+  return /^[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2}$/.test(normalizePostcode(value));
+}

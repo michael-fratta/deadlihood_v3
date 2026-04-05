@@ -1,20 +1,22 @@
 import React from "react";
-import { Text, TextInput, View } from "react-native";
+import { Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 
 export default function LocationLookupForm({
   data,
   onDropdownChange,
-  onPostcodeSubmit,
+  onSearchTextChange,
   renderDropdownItem,
+  searchHelperText,
+  searchQuery,
   selectedItem,
   styles,
-  textInputRef,
 }) {
   return (
     <View style={styles.formContent}>
       <Text style={styles.titleText}>
-        Select an administrative area of England or Wales below
+        Search for an administrative area or enter a full English or Welsh
+        postcode below
       </Text>
 
       <Dropdown
@@ -27,31 +29,20 @@ export default function LocationLookupForm({
         labelField="label"
         maxHeight={300}
         onChange={onDropdownChange}
-        placeholder="select a location"
+        onChangeText={onSearchTextChange}
+        placeholder="search area or postcode"
         placeholderStyle={styles.placeholderStyle}
         renderItem={renderDropdownItem}
+        searchQuery={searchQuery}
         search
-        searchPlaceholder="search..."
+        searchPlaceholder="search area or full postcode..."
         selectedTextStyle={styles.selectedTextStyle}
         style={styles.dropdown}
         value={selectedItem}
         valueField="value"
       />
 
-      <Text style={styles.titleText}>
-        or input an English or Welsh postcode instead
-      </Text>
-
-      <TextInput
-        autoComplete="postal-code"
-        color="#10c62d"
-        onSubmitEditing={onPostcodeSubmit}
-        placeholder="input full postcode"
-        placeholderTextColor="#4fff6b"
-        ref={textInputRef}
-        style={styles.input}
-        underlineColorAndroid="transparent"
-      />
+      <Text style={styles.searchHelperText}>{searchHelperText}</Text>
     </View>
   );
 }

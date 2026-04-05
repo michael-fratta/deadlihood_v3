@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Alert } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 import * as SplashScreen from "expo-splash-screen";
 import {
@@ -26,16 +25,16 @@ import {
   getLatestObservationLabel,
   getLatestObservationValue,
 } from "../utils/deathStatistics";
-import { formatNumber, normalizePostcode } from "../utils/formatters";
-
-function createOutOfBoundsError() {
-  const error = new Error("Postcode is outside England or Wales");
-  error.code = "OUT_OF_BOUNDS";
-  return error;
-}
+import {
+  formatNumber,
+  isFullUkPostcode,
+  isPotentialUkPostcode,
+  normalizePostcode,
+} from "../utils/formatters";
 
 export function useDeadlihoodLookup() {
-  const textInputRef = useRef(null);
+  const postcodeLookupCacheRef = useRef(new Map());
+  const postcodeLookupRequestRef = useRef(0);
   const [adminDatasetVersion, setAdminDatasetVersion] = useState(
     INITIAL_ADMIN_DATASET_VERSION,
   );
@@ -50,13 +49,15 @@ export function useDeadlihoodLookup() {
   const [deathRateEW, setDeathRateEW] = useState(0);
   const [stringlihood, setStringlihood] = useState("");
   const [week, setWeek] = useState("");
-  const [inputPostcode, setInputPostcode] = useState("");
   const [postError, setPostError] = useState(false);
   const [pressStatus, setPressStatus] = useState(false);
   const [buttonPressed, setButtonPressed] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState(false);
   const [connectionReachable, setConnectionReachable] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [postcodeSearchMatch, setPostcodeSearchMatch] = useState(null);
+  const [postcodeSearchStatus, setPostcodeSearchStatus] = useState("idle");
 
   useEffect(() => {
     let isMounted = true;
@@ -103,9 +104,92 @@ export function useDeadlihoodLookup() {
     };
   }, []);
 
-  function clearPostcodeInput() {
-    textInputRef.current?.clear?.();
-    setInputPostcode("");
+  useEffect(() => {
+    const normalizedSearchText = normalizePostcode(searchText);
+    const requestId = ++postcodeLookupRequestRef.current;
+
+    if (!searchText.trim()) {
+      setPostcodeSearchMatch(null);
+      setPostcodeSearchStatus("idle");
+      return undefined;
+    }
+
+    if (!isPotentialUkPostcode(normalizedSearchText)) {
+      setPostcodeSearchMatch(null);
+      setPostcodeSearchStatus("idle");
+      return undefined;
+    }
+
+    if (!isFullUkPostcode(normalizedSearchText)) {
+      setPostcodeSearchMatch(null);
+      setPostcodeSearchStatus("partial");
+      return undefined;
+    }
+
+    if (!(connectionStatus && connectionReachable)) {
+      setPostcodeSearchMatch(null);
+      setPostcodeSearchStatus("offline");
+      return undefined;
+    }
+
+    const timeoutId = globalThis.setTimeout(async () => {
+      const cachedMatch =
+        postcodeLookupCacheRef.current.get(normalizedSearchText);
+
+      if (cachedMatch) {
+        if (requestId !== postcodeLookupRequestRef.current) {
+          return;
+        }
+
+        setPostcodeSearchMatch(cachedMatch);
+        setPostcodeSearchStatus("resolved");
+        return;
+      }
+
+      setPostcodeSearchStatus("loading");
+
+      try {
+        const adminDistrict =
+          await fetchAdminDistrictByPostcode(normalizedSearchText);
+        const itemId = locationNameToId[adminDistrict];
+
+        if (requestId !== postcodeLookupRequestRef.current) {
+          return;
+        }
+
+        if (!itemId) {
+          setPostcodeSearchMatch(null);
+          setPostcodeSearchStatus("out-of-bounds");
+          return;
+        }
+
+        const match = {
+          label: adminDistrict,
+          value: itemId,
+        };
+
+        postcodeLookupCacheRef.current.set(normalizedSearchText, match);
+        setPostcodeSearchMatch(match);
+        setPostcodeSearchStatus("resolved");
+      } catch {
+        if (requestId !== postcodeLookupRequestRef.current) {
+          return;
+        }
+
+        setPostcodeSearchMatch(null);
+        setPostcodeSearchStatus("invalid");
+      }
+    }, 300);
+
+    return () => {
+      globalThis.clearTimeout(timeoutId);
+    };
+  }, [connectionReachable, connectionStatus, searchText]);
+
+  function resetSearchInput() {
+    setSearchText("");
+    setPostcodeSearchMatch(null);
+    setPostcodeSearchStatus("idle");
   }
 
   function resetLookupState() {
@@ -123,18 +207,50 @@ export function useDeadlihoodLookup() {
     setButtonPressed(true);
   }
 
-  function showInvalidPostcodeAlert() {
-    Alert.alert(
-      "OOPS!",
-      "Something went wrong.\n\nYou either didn't type anything, made a mistake, or used a postcode from a country other than the UK.\n\nPlease try again!",
-    );
+  function getSearchHelperText() {
+    switch (postcodeSearchStatus) {
+      case "partial":
+        return "Keep typing the full postcode to match its administrative area.";
+      case "loading":
+        return "Looking up postcode...";
+      case "resolved":
+        return `Postcode matches ${postcodeSearchMatch?.label}. Tap it to run the lookup.`;
+      case "invalid":
+        return "Postcode not found. Search by area name or enter a full UK postcode.";
+      case "out-of-bounds":
+        return "This postcode is valid but outside England and Wales.";
+      case "offline":
+        return "Connect to the internet to search by postcode.";
+      default:
+        return "Search by administrative area or enter a full postcode.";
+    }
   }
 
-  function showOutOfBoundsAlert() {
-    Alert.alert(
-      "OOPS!",
-      "Something went wrong.\n\nThe postcode you entered is a valid UK postcode, but it's not within England or Wales.\n\nPlease try again with a different postcode, or use the dropdown menu for a guaranteed result!",
-    );
+  function handleSearchTextChange(text) {
+    setSearchText(text);
+    setPostError(false);
+  }
+
+  function searchQuery(keyword, labelValue) {
+    const trimmedKeyword = String(keyword || "").trim();
+
+    if (!trimmedKeyword) {
+      return true;
+    }
+
+    const normalizedKeyword = normalizePostcode(trimmedKeyword);
+
+    if (isPotentialUkPostcode(normalizedKeyword)) {
+      if (!isFullUkPostcode(normalizedKeyword)) {
+        return false;
+      }
+
+      return postcodeSearchMatch
+        ? labelValue === postcodeSearchMatch.label
+        : false;
+    }
+
+    return labelValue.toLowerCase().includes(trimmedKeyword.toLowerCase());
   }
 
   async function runLookup({ itemId, cityName }) {
@@ -200,60 +316,15 @@ export function useDeadlihoodLookup() {
       setPostError(true);
       setStringlihood("");
     } finally {
-      clearPostcodeInput();
+      resetSearchInput();
       setLoading(false);
     }
   }
 
   async function handleDropdownChange(item) {
     resetLookupState();
+    resetSearchInput();
     await runLookup({ itemId: item.value, cityName: item.label });
-  }
-
-  async function handlePostcodeSubmit(event) {
-    const normalizedPostcode = normalizePostcode(event?.nativeEvent?.text);
-    setInputPostcode(normalizedPostcode);
-
-    if (!normalizedPostcode) {
-      setPostError(true);
-
-      if (connectionStatus && connectionReachable) {
-        showInvalidPostcodeAlert();
-      }
-
-      clearPostcodeInput();
-      return;
-    }
-
-    resetLookupState();
-
-    try {
-      const adminDistrict =
-        await fetchAdminDistrictByPostcode(normalizedPostcode);
-      const itemId = locationNameToId[adminDistrict];
-
-      if (!itemId) {
-        throw createOutOfBoundsError();
-      }
-
-      await runLookup({ itemId, cityName: adminDistrict });
-    } catch (error) {
-      setPostError(true);
-      setLoading(false);
-      setButtonPressed(true);
-      clearPostcodeInput();
-
-      if (!(connectionStatus && connectionReachable)) {
-        return;
-      }
-
-      if (error.code === "OUT_OF_BOUNDS") {
-        showOutOfBoundsAlert();
-        return;
-      }
-
-      showInvalidPostcodeAlert();
-    }
   }
 
   return {
@@ -263,20 +334,20 @@ export function useDeadlihoodLookup() {
     deathRate,
     deathRateEW,
     handleDropdownChange,
-    handlePostcodeSubmit,
-    inputPostcode,
+    handleSearchTextChange,
     loading,
     locationOptions,
     onHideUnderlay: () => setPressStatus(false),
     onShowUnderlay: () => setPressStatus(true),
     postError,
+    searchHelperText: getSearchHelperText(),
+    searchQuery,
     pressStatus,
     results: {
       connectionReachable,
       connectionStatus,
       deathRate,
       deathRateEW,
-      inputPostcode,
       postError,
       selectedCity,
       selectedItem,
@@ -287,7 +358,6 @@ export function useDeadlihoodLookup() {
       week,
     },
     selectedItem,
-    textInputRef,
     dismissResults,
   };
 }

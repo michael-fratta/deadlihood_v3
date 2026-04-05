@@ -22,15 +22,16 @@ export default function HomeScreen() {
     buttonPressed,
     dismissResults,
     handleDropdownChange,
-    handlePostcodeSubmit,
+    handleSearchTextChange,
     loading,
     locationOptions,
     onHideUnderlay,
     onShowUnderlay,
     pressStatus,
     results,
+    searchHelperText,
+    searchQuery,
     selectedItem,
-    textInputRef,
   } = useDeadlihoodLookup();
 
   return (
@@ -59,11 +60,12 @@ export default function HomeScreen() {
         <LocationLookupForm
           data={locationOptions}
           onDropdownChange={handleDropdownChange}
-          onPostcodeSubmit={handlePostcodeSubmit}
+          onSearchTextChange={handleSearchTextChange}
           renderDropdownItem={renderDropdownItem}
+          searchHelperText={searchHelperText}
+          searchQuery={searchQuery}
           selectedItem={selectedItem}
           styles={styles}
-          textInputRef={textInputRef}
         />
 
         <PreLoader visible={loading} />
@@ -161,13 +163,15 @@ const styles = StyleSheet.create({
     zIndex: 2,
     position: "relative",
   },
-  input: {
-    padding: 12,
-    borderRadius: 10,
-    maxWidth: "80%",
-    minWidth: "75%",
-    backgroundColor: COLORS.card,
-    marginTop: 5,
+  searchHelperText: {
+    marginTop: 12,
+    maxWidth: "75%",
+    textAlign: "center",
+    fontSize: 14,
+    fontWeight: "bold",
+    color: COLORS.textSecondary,
+    textShadowColor: COLORS.textDark,
+    textShadowRadius: 4,
   },
   postLoaderOverlay: {
     position: "absolute",
