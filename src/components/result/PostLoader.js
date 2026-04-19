@@ -66,7 +66,10 @@ export default function PostLoader({
             }}
           >
             <View style={styles.modalView}>
-              <ScrollView contentContainerStyle={styles.scrollContentContainer}>
+              <ScrollView
+                style={styles.modalScrollView}
+                contentContainerStyle={styles.modalScrollContentContainer}
+              >
                 <Text style={styles.breakText}>
                   The breakdown for {selectedCity}, and for England & Wales -
                   for the last week of 2023 - is as follows below ⤵
@@ -241,6 +244,14 @@ export default function PostLoader({
 const styles = StyleSheet.create({
   scrollContentContainer: {
     alignItems: "center",
+  },
+  modalScrollView: {
+    alignSelf: "stretch",
+    width: "100%",
+  },
+  modalScrollContentContainer: {
+    paddingRight: 16,
+    paddingBottom: 8,
   },
   contentContainer: {
     borderWidth: 3,
