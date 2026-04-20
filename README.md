@@ -2,9 +2,7 @@ Weekly deaths statistics lookup tool. All data is obtained via the ONS (Office f
 
 Initially developed for an end of degree project - module TM470 - for a BSc Hons in Computing and IT with The Open University.
 
-Available on Google Play: https://play.google.com/store/apps/details?id=com.fractal_developments.deadlihood
-
-If you don't have an Android device, you can try it through an emulator here: https://snack.expo.dev/@michael-fratta/deadlihood
+Try it through an emulator here: https://snack.expo.dev/@michael-fratta/deadlihood
 
 Other details:
 
